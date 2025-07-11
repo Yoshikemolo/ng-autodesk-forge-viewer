@@ -1,0 +1,50 @@
+{
+  "name": "ng-autodesk-forge-viewer",
+  "version": "0.0.1",
+  "description": "Angular 19 application with Autodesk Forge Viewer integration and GraphQL backend",
+  "private": true,
+  "scripts": {
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "dev": "docker-compose up",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:backend": "cd backend && npm run start:dev",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build:prod",
+    "build:backend": "cd backend && npm run build",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && npm test",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up -d"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ximplicity/ng-autodesk-forge-viewer.git"
+  },
+  "keywords": [
+    "angular",
+    "autodesk",
+    "forge",
+    "viewer",
+    "threejs",
+    "graphql",
+    "nestjs",
+    "postgresql",
+    "docker"
+  ],
+  "author": "Ximplicity",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ximplicity/ng-autodesk-forge-viewer/issues"
+  },
+  "homepage": "https://github.com/Ximplicity/ng-autodesk-forge-viewer#readme",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
