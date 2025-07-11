@@ -42,18 +42,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [
-              {
-                "input": "https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js",
-                "inject": false,
-                "bundleName": "forge-viewer"
-              },
-              {
-                "input": "https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css",
-                "inject": false,
-                "bundleName": "forge-viewer-style"
-              }
-            ],
+            "scripts": [],
             "allowedCommonJsDependencies": [
               "graphql-tag",
               "zen-observable"
@@ -76,16 +65,12 @@
               "outputHashing": "all",
               "optimization": true,
               "sourceMap": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true
+              "extractLicenses": true
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true,
-              "vendorChunk": true,
-              "buildOptimizer": false
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"

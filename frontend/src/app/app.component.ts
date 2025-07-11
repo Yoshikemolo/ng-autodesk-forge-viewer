@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
 import { ForgeViewerComponent } from './components/forge-viewer/forge-viewer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, ForgeViewerComponent],
+  imports: [CommonModule, ForgeViewerComponent],
   template: `
     <div class="app-container">
       <header class="app-header">

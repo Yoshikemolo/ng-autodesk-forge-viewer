@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ForgeService } from '../../services/forge.service';
 import { ThreeJsToolService } from '../../services/threejs-tool.service';
@@ -108,7 +108,8 @@ export class ForgeViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private forgeService: ForgeService,
-    private threeJsToolService: ThreeJsToolService
+    private threeJsToolService: ThreeJsToolService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -117,7 +118,10 @@ export class ForgeViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.initializeViewer();
+    // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+    setTimeout(() => {
+      this.initializeViewer();
+    }, 0);
   }
 
   ngOnDestroy(): void {
@@ -129,6 +133,7 @@ export class ForgeViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async initializeViewer(): Promise<void> {
     this.loading = true;
+    this.cdr.detectChanges(); // Force change detection after setting loading state
 
     try {
       // Get access token
@@ -151,6 +156,7 @@ export class ForgeViewerComponent implements OnInit, AfterViewInit, OnDestroy {
         if (startedCode > 0) {
           console.error('Failed to create a Viewer: WebGL not supported.');
           this.loading = false;
+          this.cdr.detectChanges();
           return;
         }
 
@@ -159,10 +165,12 @@ export class ForgeViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
         console.log('Viewer initialized successfully');
         this.loading = false;
+        this.cdr.detectChanges();
       });
     } catch (error) {
       console.error('Error initializing viewer:', error);
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -170,6 +178,7 @@ export class ForgeViewerComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.viewer) return;
 
     this.loading = true;
+    this.cdr.detectChanges();
 
     try {
       // For demo purposes, we'll use a sample URN
@@ -184,17 +193,20 @@ export class ForgeViewerComponent implements OnInit, AfterViewInit, OnDestroy {
             this.viewer.loadDocumentNode(doc, viewables).then(() => {
               console.log('Model loaded successfully');
               this.loading = false;
+              this.cdr.detectChanges();
             });
           }
         },
         (errorCode: string, errorMsg: string) => {
           console.error('Failed to load model:', errorCode, errorMsg);
           this.loading = false;
+          this.cdr.detectChanges();
         }
       );
     } catch (error) {
       console.error('Error loading model:', error);
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 

@@ -43,8 +43,23 @@ async function bootstrap() {
   const port = configService.get<number>('BACKEND_PORT', 3000);
   
   // Enable CORS
+  const corsOrigins = configService.get<string>('CORS_ORIGIN', 'http://localhost:4200')
+    .split(',')
+    .map(origin => origin.trim());
+  
+  // Add common development ports
+  const developmentOrigins = [
+    'http://localhost:4200',
+    'http://localhost:4201',
+    'http://localhost:4202',
+    'http://localhost:4203'
+  ];
+  
+  // Combine configured origins with development origins
+  const allowedOrigins = [...new Set([...corsOrigins, ...developmentOrigins])];
+  
   app.enableCors({
-    origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:4200'),
+    origin: allowedOrigins,
     credentials: true,
   });
   
