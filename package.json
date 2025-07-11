@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "install:all": "npm run install:frontend && npm run install:backend",
-    "install:frontend": "cd frontend && npm install",
-    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install --legacy-peer-deps",
+    "install:backend": "cd backend && npm install --legacy-peer-deps",
     "dev": "docker-compose up",
     "dev:frontend": "cd frontend && npm start",
     "dev:backend": "cd backend && npm run start:dev",
@@ -20,7 +20,10 @@
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
-    "docker:prod": "docker-compose -f docker-compose.prod.yml up -d"
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up -d",
+    "clean": "npm run clean:frontend && npm run clean:backend",
+    "clean:frontend": "cd frontend && rimraf node_modules package-lock.json .angular",
+    "clean:backend": "cd backend && rimraf node_modules package-lock.json"
   },
   "repository": {
     "type": "git",

@@ -26,6 +26,7 @@ Dockerfile text eol=lf
 .env text eol=lf
 .env.* text eol=lf
 .nvmrc text eol=lf
+.npmrc text eol=lf
 .prettierrc text eol=lf
 .eslintrc text eol=lf
 .eslintrc.* text eol=lf
@@ -33,6 +34,15 @@ Dockerfile text eol=lf
 # Force Windows batch files to use CRLF
 *.bat text eol=crlf
 *.cmd text eol=crlf
+start-docker.bat text eol=crlf
+start-dev.bat text eol=crlf
+fix-angular.bat text eol=crlf
+dev.bat text eol=crlf
+build.bat text eol=crlf
+npm-install-options.bat text eol=crlf
+setup-database.bat text eol=crlf
+check-status.bat text eol=crlf
+scripts/*.bat text eol=crlf
 
 # Denote all files that are truly binary and should not be modified
 *.png binary

@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 */node_modules/
+**/node_modules/
 
 # Environment variables
 .env
@@ -39,6 +40,8 @@ dist/
 build/
 */dist/
 */build/
+backend/dist/
+frontend/dist/
 
 # Docker
 docker-compose.override.yml
@@ -56,11 +59,13 @@ docker-compose.override.yml
 /libpeerconnection.log
 testem.log
 /typings
+frontend/.angular/
 
 # Backend specific
 ormconfig.json
 dist-ssr
 *.local
+backend/dist/
 
 # Database
 *.sqlite
@@ -87,3 +92,16 @@ public/uploads/
 .dynamodb/
 .tern-port
 .env.production
+
+# PostgreSQL Password Files
+*.pgpass
+pgpass.conf
+PGPASS
+
+# Health check temp files
+temp_status.txt
+
+# Package lock files (optional - uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
