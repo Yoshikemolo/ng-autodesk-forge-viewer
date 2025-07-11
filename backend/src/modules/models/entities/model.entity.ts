@@ -20,19 +20,19 @@ export class Model {
   id: string;
 
   @Field()
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   name: string;
 
   @Field()
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 500, unique: true })
   urn: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true })
+  @Column({ name: 'object_id', type: 'varchar', length: 500, nullable: true })
   objectId?: string;
 
   @Field()
-  @Column({ default: 'pending' })
+  @Column({ type: 'varchar', length: 50, default: 'pending' })
   status: string;
 
   @Field(() => String, { nullable: true })

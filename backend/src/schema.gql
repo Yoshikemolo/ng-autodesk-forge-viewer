@@ -1,0 +1,125 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Annotation {
+  createdAt: DateTime!
+  data: String!
+  id: ID!
+  model: Model!
+  position: String
+  type: String!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type AuthResponse {
+  access_token: String!
+  user: User!
+}
+
+input CreateAnnotationInput {
+  data: String!
+  modelId: String!
+  position: String
+  type: String!
+}
+
+input CreateModelInput {
+  metadata: String
+  name: String!
+  objectId: String
+  urn: String!
+}
+
+input CreateUserInput {
+  email: String!
+  firstName: String
+  lastName: String
+  password: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Model {
+  annotations: [Annotation!]!
+  createdAt: DateTime!
+  id: ID!
+  metadata: String
+  name: String!
+  objectId: String
+  status: String!
+  updatedAt: DateTime!
+  urn: String!
+  user: User!
+}
+
+type Mutation {
+  createAnnotation(createAnnotationInput: CreateAnnotationInput!): Annotation!
+  createModel(createModelInput: CreateModelInput!): Model!
+  createUser(createUserInput: CreateUserInput!): User!
+  login(loginInput: LoginInput!): AuthResponse!
+  register(createUserInput: CreateUserInput!): User!
+  removeAnnotation(id: String!): Boolean!
+  removeModel(id: String!): Boolean!
+  removeUser(id: String!): Boolean!
+  updateAnnotation(updateAnnotationInput: UpdateAnnotationInput!): Annotation!
+  updateModel(updateModelInput: UpdateModelInput!): Model!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+}
+
+type Query {
+  allModels: [Model!]!
+  annotation(id: String!): Annotation!
+  annotations(modelId: String): [Annotation!]!
+  me: User!
+  model(id: String!): Model!
+  models: [Model!]!
+  user(id: String!): User!
+  users: [User!]!
+}
+
+input UpdateAnnotationInput {
+  data: String
+  id: ID!
+  modelId: String
+  position: String
+  type: String
+}
+
+input UpdateModelInput {
+  id: ID!
+  metadata: String
+  name: String
+  objectId: String
+  status: String
+  urn: String
+}
+
+input UpdateUserInput {
+  email: String
+  firstName: String
+  id: ID!
+  lastName: String
+  password: String
+}
+
+type User {
+  annotations: [Annotation!]!
+  createdAt: DateTime!
+  email: String!
+  firstName: String
+  id: ID!
+  isActive: Boolean!
+  lastName: String
+  models: [Model!]!
+  updatedAt: DateTime!
+}

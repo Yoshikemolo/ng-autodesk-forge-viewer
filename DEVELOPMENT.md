@@ -2,6 +2,13 @@
 
 ## 🎯 Quick Start
 
+### Simplest Way
+```bash
+./start.bat
+```
+This interactive script will guide you through the best option for your situation.
+
+### Advanced Menu
 **Windows users:** Use the interactive menu:
 ```bash
 ./dev.bat

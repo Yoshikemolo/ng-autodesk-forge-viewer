@@ -5,7 +5,7 @@ echo ===============================================
 
 REM Check if Docker is installed
 docker --version >nul 2>&1
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo ERROR: Docker is not installed.
     echo Please install Docker Desktop from: https://www.docker.com/products/docker-desktop
     pause
@@ -14,26 +14,31 @@ if %errorlevel% neq 0 (
 
 REM Check if Docker Desktop is running
 docker ps >nul 2>&1
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo Docker Desktop is not running. Attempting to start it...
     
     REM Try to start Docker Desktop
-    start "" "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+    REM Check common Docker Desktop locations
+    if exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
+        start "" "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+    ) else if exist "%LOCALAPPDATA%\Docker\Docker Desktop.exe" (
+        start "" "%LOCALAPPDATA%\Docker\Docker Desktop.exe"
+    ) else (
+        echo ERROR: Could not find Docker Desktop executable.
+        echo Please start Docker Desktop manually from the Start Menu.
+        pause
+        exit /b 1
+    )
     
     echo Waiting for Docker Desktop to start completely...
     echo This may take 30-60 seconds...
     
-    REM Wait until Docker is ready (maximum 60 seconds)
-    set count=0
-    :wait_loop
-    timeout /t 5 /nobreak >nul
-    docker ps >nul 2>&1
-    if %errorlevel% equ 0 goto docker_ready
-    
-    set /a count+=5
-    if %count% lss 60 (
-        echo Waiting... %count% seconds
-        goto wait_loop
+    REM Simple wait loop - try 12 times with 5 second intervals
+    for /L %%i in (1,1,12) do (
+        timeout /t 5 /nobreak >nul
+        docker ps >nul 2>&1
+        if not errorlevel 1 goto docker_ready
+        echo Waiting... attempt %%i of 12
     )
     
     echo ERROR: Docker Desktop could not start after 60 seconds.

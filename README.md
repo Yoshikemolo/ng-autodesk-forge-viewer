@@ -2,6 +2,12 @@
 
 ## 🎯 Quick Start
 
+### Easiest Way - Interactive Start
+```bash
+./start.bat
+```
+
+### Standard Docker Setup
 1. **Clone and setup**
    ```bash
    git clone https://github.com/Ximplicity/ng-autodesk-forge-viewer.git

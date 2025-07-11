@@ -12,7 +12,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
     password: configService.get<string>('POSTGRES_PASSWORD', 'password'),
     database: configService.get<string>('POSTGRES_DB', 'forge_viewer_db'),
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    synchronize: configService.get<string>('NODE_ENV') === 'development',
+    synchronize: false, // Disabled because we use init.sql for initial setup
     logging: configService.get<string>('NODE_ENV') === 'development',
     migrations: [__dirname + '/../migrations/*{.ts,.js}'],
     migrationsTableName: 'migrations',

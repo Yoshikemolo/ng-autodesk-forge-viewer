@@ -1,0 +1,3 @@
+@echo off
+echo Starting Docker with PowerShell script...
+powershell -ExecutionPolicy Bypass -File start-docker.ps1

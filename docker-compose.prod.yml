@@ -1,7 +1,7 @@
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16.7
     container_name: forge-postgres-prod
     restart: always
     environment:
