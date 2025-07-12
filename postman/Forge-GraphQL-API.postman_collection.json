@@ -1,0 +1,380 @@
+{
+  "info": {
+    "name": "Forge GraphQL API Testing",
+    "description": "Collection for testing Autodesk Forge integration via GraphQL and REST endpoints",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GraphQL Queries",
+      "item": [
+        {
+          "name": "Test Forge Service (GraphQL)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query TestForgeService {\\n  testForgeService\\n}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Test GraphQL resolver for Forge service connectivity"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Forge Token (GraphQL)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetForgeToken {\\n  getForgeToken\\n}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Get Forge access token via GraphQL"
+          },
+          "response": []
+        },
+        {
+          "name": "Test Query (GraphQL)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query TestQuery {\\n  testQuery\\n}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Simple test query to verify GraphQL is working"
+          },
+          "response": []
+        },
+        {
+          "name": "GraphQL Schema Introspection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query IntrospectionQuery {\\n  __schema {\\n    queryType {\\n      name\\n      fields {\\n        name\\n        description\\n        type {\\n          name\\n          kind\\n        }\\n      }\\n    }\\n  }\\n}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Get all available GraphQL queries and their schema"
+          },
+          "response": []
+        }
+      ],
+      "description": "GraphQL queries for testing Forge and other services"
+    },
+    {
+      "name": "REST Endpoints",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check if the backend is running"
+          },
+          "response": []
+        },
+        {
+          "name": "Forge - Test Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/forge/test",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "forge", "test"]
+            },
+            "description": "Test Forge controller connectivity"
+          },
+          "response": []
+        },
+        {
+          "name": "Forge - Get Access Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/forge/auth/token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "forge", "auth", "token"]
+            },
+            "description": "Get Forge access token via REST endpoint"
+          },
+          "response": []
+        },
+        {
+          "name": "Settings - Get Forge Credentials Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/settings/forge/credentials/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "settings", "forge", "credentials", "status"]
+            },
+            "description": "Check status of Forge credentials configuration"
+          },
+          "response": []
+        },
+        {
+          "name": "Settings - Set Forge Credentials",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": \"{{forgeClientId}}\",\n  \"clientSecret\": \"{{forgeClientSecret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/settings/forge/credentials",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "settings", "forge", "credentials"]
+            },
+            "description": "Set Forge credentials (Client ID and Client Secret)"
+          },
+          "response": []
+        },
+        {
+          "name": "Settings - Delete Forge Credentials",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/settings/forge/credentials",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "settings", "forge", "credentials"]
+            },
+            "description": "Delete stored Forge credentials"
+          },
+          "response": []
+        }
+      ],
+      "description": "REST API endpoints for Forge and Settings"
+    },
+    {
+      "name": "Forge Model Operations",
+      "item": [
+        {
+          "name": "Upload File to Forge",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/your/3d-model-file.dwg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/forge/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "forge", "upload"]
+            },
+            "description": "Upload a 3D model file to Forge for processing"
+          },
+          "response": []
+        },
+        {
+          "name": "Translate Model",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"urn\": \"{{modelUrn}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/forge/translate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "forge", "translate"]
+            },
+            "description": "Start translation process for a model"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Translation Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/forge/translate/{{modelUrn}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "forge", "translate", "{{modelUrn}}", "status"]
+            },
+            "description": "Check the status of model translation"
+          },
+          "response": []
+        }
+      ],
+      "description": "Operations for uploading and processing 3D models"
+    },
+    {
+      "name": "Debug & Troubleshooting",
+      "item": [
+        {
+          "name": "Get All GraphQL Queries",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetAllQueries {\\n  __schema {\\n    queryType {\\n      fields {\\n        name\\n        description\\n        args {\\n          name\\n          type {\\n            name\\n          }\\n        }\\n        type {\\n          name\\n        }\\n      }\\n    }\\n  }\\n}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "List all available GraphQL queries for debugging"
+          },
+          "response": []
+        },
+        {
+          "name": "Test Multiple Queries",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query MultipleTests {\\n  test: testQuery\\n  forge: testForgeService\\n  token: getForgeToken\\n}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Run multiple test queries simultaneously"
+          },
+          "response": []
+        }
+      ],
+      "description": "Debugging and troubleshooting requests"
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "description": "Base URL for the backend API"
+    },
+    {
+      "key": "forgeClientId",
+      "value": "your-forge-client-id-here",
+      "description": "Autodesk Forge Client ID"
+    },
+    {
+      "key": "forgeClientSecret",
+      "value": "your-forge-client-secret-here",
+      "description": "Autodesk Forge Client Secret"
+    },
+    {
+      "key": "modelUrn",
+      "value": "example-model-urn",
+      "description": "URN of a model for translation testing"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-set timestamp for requests",
+          "pm.globals.set('timestamp', new Date().toISOString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Common test scripts",
+          "pm.test('Response time is less than 5000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "pm.test('Response is not empty', function () {",
+          "    pm.expect(pm.response.text()).to.not.be.empty;",
+          "});",
+          "",
+          "// Log response for debugging",
+          "console.log('Response Status:', pm.response.status);",
+          "console.log('Response Body:', pm.response.text());"
+        ]
+      }
+    }
+  ]
+}

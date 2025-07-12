@@ -9,6 +9,12 @@ interface AccessToken {
   expires_in: number;
 }
 
+interface GraphQLResponse {
+  data: {
+    getForgeToken: string;
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -28,24 +34,41 @@ export class ForgeService {
       return this.accessToken;
     }
 
-    // Fetch new token from backend
-    return this.fetchAccessToken();
+    // Fetch new token from backend using GraphQL
+    return this.fetchAccessTokenGraphQL();
   }
 
-  private async fetchAccessToken(): Promise<AccessToken> {
+  private async fetchAccessTokenGraphQL(): Promise<AccessToken> {
     try {
-      const token = await this.http.get<AccessToken>(`${environment.apiUrl}/forge/auth/token`).toPromise();
+      console.log('Fetching Forge token via GraphQL...');
       
-      if (token) {
+      const query = {
+        query: `query { getForgeToken }`
+      };
+
+      const response = await this.http.post<GraphQLResponse>(environment.graphqlEndpoint, query).toPromise();
+      
+      if (response?.data?.getForgeToken) {
+        const tokenString = response.data.getForgeToken;
+        
+        // Create token object in expected format
+        const token: AccessToken = {
+          access_token: tokenString,
+          token_type: 'Bearer',
+          expires_in: 3600 // Default 1 hour
+        };
+        
         this.accessToken = token;
         // Set expiry with 5 minute buffer
         this.tokenExpiry = Date.now() + ((token.expires_in - 300) * 1000);
+        
+        console.log('Forge token obtained successfully via GraphQL');
         return token;
       }
       
-      throw new Error('Failed to get access token');
+      throw new Error('Failed to get access token from GraphQL response');
     } catch (error) {
-      console.error('Error fetching access token:', error);
+      console.error('Error fetching access token via GraphQL:', error);
       throw error;
     }
   }

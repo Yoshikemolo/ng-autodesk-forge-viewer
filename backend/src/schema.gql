@@ -80,6 +80,7 @@ type Query {
   allModels: [Model!]!
   annotation(id: String!): Annotation!
   annotations(modelId: String): [Annotation!]!
+  getForgeToken: String!
   me: User!
   model(id: String!): Model!
   models: [Model!]!

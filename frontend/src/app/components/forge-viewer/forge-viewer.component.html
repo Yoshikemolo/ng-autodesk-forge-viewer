@@ -1,0 +1,52 @@
+<div class="viewer-container">
+  <!-- Toolbar -->
+  <div class="viewer-toolbar">
+    <button (click)="loadSimpleGeometry()" [disabled]="loading" class="btn btn-success">
+      Load Simple Geometry
+    </button>
+    <button (click)="loadCustomUrn()" [disabled]="loading" class="btn btn-info">
+      Load Custom URN
+    </button>
+    <button (click)="loadTestModel()" [disabled]="loading" class="btn btn-warning">
+      Load Built-in Test Model
+    </button>
+    <button (click)="toggleThreeJsTool()" [disabled]="!viewer" class="btn btn-secondary">
+      {{ threeJsToolActive ? 'Disable' : 'Enable' }} ThreeJS Tool
+    </button>
+
+    <!-- Model selector overlay -->
+    <select id="demo-models-selector" class="model-selector" (change)="onModelChange($event)" [disabled]="loading">
+      <option value="">Select a model ({{ models.length }} available)</option>
+      <option *ngFor="let model of models" [value]="model.urn">
+        {{ model.name }}
+      </option>
+    </select>
+
+    <!-- Info badge -->
+    <div class="info-badge">
+      <span class="badge badge-info"> 💡 Use the dropdown to select demo models </span>
+    </div>
+  </div>
+
+  <!-- Debug info -->
+  <div class="debug-info">
+    <p>Viewer Status: {{ viewer ? '✅ Initialized' : '❌ Not initialized' }}</p>
+    <p>Models Count: {{ models.length }}</p>
+    <p>Loading: {{ loading ? '🔄 Yes' : '✅ No' }}</p>
+    <p>ThreeJS Tool: {{ threeJsToolActive ? '🔧 Active' : '💤 Inactive' }}</p>
+  </div>
+
+  <!-- Main viewer area -->
+  <div class="forge-viewer-container">
+    <!-- Forge Viewer container -->
+    <div #viewerContainer class="forge-viewer" [class.loading]="loading">
+      <div *ngIf="loading" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading viewer...</p>
+      </div>
+      <div *ngIf="!loading && !viewer" class="viewer-placeholder">
+        <p>Click a button above to load a model</p>
+      </div>
+    </div>
+  </div>
+</div>

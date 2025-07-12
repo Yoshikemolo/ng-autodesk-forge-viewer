@@ -25,6 +25,7 @@ export class ModelsResolver {
   @Query(() => [Model], { name: 'models' })
   @UseGuards(GqlAuthGuard)
   async findAll(@CurrentUser() user: User) {
+    console.log('🔍 Fetching models for user:', user.id);
     // Return only user's models
     return this.modelsService.findAll(user.id);
   }

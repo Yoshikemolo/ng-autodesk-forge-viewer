@@ -16,10 +16,22 @@ export class ThreeJsToolService {
   registerTool(viewer: any): void {
     this.viewer = viewer;
     
-    // Create the custom tool
+    // Check if toolController is available
+    if (!viewer.toolController) {
+      console.error('ToolController not available on viewer');
+      return;
+    }
+    
+    // Create the custom tool constructor function
     const ThreeJsAnnotationTool = function(this: any) {
       const self = this;
       self.names = ['ThreeJsAnnotationTool'];
+      self.active = false;
+      
+      // Required method by Forge Viewer
+      self.getNames = function() {
+        return self.names;
+      };
       
       // Tool activation
       self.activate = function() {
@@ -57,8 +69,14 @@ export class ThreeJsToolService {
     // Store reference to this service in window for tool access
     (window as any).threeJsToolService = this;
     
-    // Register the tool
-    viewer.toolController.registerTool(ThreeJsAnnotationTool);
+    // Register the tool with proper error handling
+    try {
+      const threeJsAnnotationToolInstance = new (ThreeJsAnnotationTool as any)();
+      viewer.toolController.registerTool(threeJsAnnotationToolInstance);
+      console.log('ThreeJS Annotation Tool registered successfully');
+    } catch (error) {
+      console.error('Failed to register ThreeJS Annotation Tool:', error);
+    }
     
     // Initialize overlay scene
     this.initializeOverlay();
@@ -67,42 +85,68 @@ export class ThreeJsToolService {
   private initializeOverlay(): void {
     if (!this.viewer) return;
 
-    // Create overlay scene
-    this.viewer.impl.createOverlayScene('ThreeJsAnnotations');
-    this.overlayScene = this.viewer.impl.overlayScenes['ThreeJsAnnotations'].scene;
-    
-    // Add annotations group to overlay
-    if (this.overlayScene) {
-      this.overlayScene.add(this.annotations);
+    try {
+      // Create overlay scene
+      this.viewer.impl.createOverlayScene('ThreeJsAnnotations');
+      
+      // Get the overlay scene
+      const overlayData = this.viewer.impl.overlayScenes['ThreeJsAnnotations'];
+      if (overlayData && overlayData.scene) {
+        this.overlayScene = overlayData.scene;
+        
+        // Don't add the annotations group directly to overlay scene
+        // Instead, we'll add individual annotations to the group
+        // and then add them to the overlay scene when needed
+        console.log('Overlay scene initialized successfully');
+      } else {
+        console.error('Failed to get overlay scene');
+      }
+    } catch (error) {
+      console.error('Error initializing overlay:', error);
     }
   }
 
   createAnnotation(point: THREE.Vector3): void {
-    if (!this.overlayScene) return;
+    if (!this.overlayScene) {
+      console.error('Overlay scene not available');
+      return;
+    }
 
-    // Create annotation sphere
-    const geometry = new THREE.SphereGeometry(5, 32, 32);
-    const material = new THREE.MeshBasicMaterial({ 
-      color: 0xff0000,
-      transparent: true,
-      opacity: 0.8
-    });
-    const sphere = new THREE.Mesh(geometry, material);
-    
-    // Position at clicked point
-    sphere.position.copy(point);
-    
-    // Add to annotations group
-    this.annotations.add(sphere);
-    
-    // Create label
-    this.createLabel(point, `Annotation ${this.annotations.children.length}`);
-    
-    // Refresh viewer
-    this.viewer.impl.invalidate(true);
-    
-    // Save annotation to backend
-    this.saveAnnotation(point);
+    try {
+      // Use Forge Viewer's internal THREE.js to avoid conflicts
+      const THREE = (window as any).Autodesk.Viewing.Private.THREE;
+      
+      // Create annotation sphere using Forge's THREE.js
+      const geometry = new THREE.SphereGeometry(5, 32, 32);
+      const material = new THREE.MeshBasicMaterial({ 
+        color: 0xff0000,
+        transparent: true,
+        opacity: 0.8
+      });
+      const sphere = new THREE.Mesh(geometry, material);
+      
+      // Position at clicked point
+      sphere.position.copy(point);
+      
+      // Add to annotations group for tracking
+      this.annotations.add(sphere);
+      
+      // Add directly to overlay scene
+      this.overlayScene.add(sphere);
+      
+      // Create label
+      this.createLabel(point, `Annotation ${this.annotations.children.length}`);
+      
+      // Refresh viewer
+      this.viewer.impl.invalidate(true);
+      
+      // Save annotation to backend
+      this.saveAnnotation(point);
+      
+      console.log('Annotation created successfully at:', point);
+    } catch (error) {
+      console.error('Error creating annotation:', error);
+    }
   }
 
   private createLabel(position: THREE.Vector3, text: string): void {
@@ -128,10 +172,17 @@ export class ThreeJsToolService {
   }
 
   clearAnnotations(): void {
-    // Remove all children from annotations group
+    // Remove all children from annotations group and overlay scene
     while (this.annotations.children.length > 0) {
       const child = this.annotations.children[0];
+      
+      // Remove from annotations group
       this.annotations.remove(child);
+      
+      // Remove from overlay scene if it exists
+      if (this.overlayScene) {
+        this.overlayScene.remove(child);
+      }
       
       // Dispose of geometries and materials
       if ((child as THREE.Mesh).geometry) {
@@ -151,6 +202,8 @@ export class ThreeJsToolService {
     if (this.viewer) {
       this.viewer.impl.invalidate(true);
     }
+    
+    console.log('All annotations cleared');
   }
 
   getAnnotations(): any[] {

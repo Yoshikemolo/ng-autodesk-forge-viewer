@@ -93,4 +93,39 @@ export class ForgeController {
   async getTranslationStatus(@Param('urn') urn: string) {
     return this.forgeService.getTranslationStatus(urn);
   }
+
+  @Get('models-test')
+  async getModels() {
+    this.logger.log('🔍 GET /forge/models-test endpoint called');
+    console.log('🔍 GET /forge/models-test endpoint called - models route accessed');
+    
+    // Simple test response without calling ForgeService
+    return {
+      message: 'Models endpoint is working',
+      timestamp: new Date().toISOString(),
+      models: []
+    };
+    
+    /* 
+    try {
+      const bucketKey = 'forge-viewer-models';
+      const objectsList = await this.forgeService.listObjects(bucketKey);
+      
+      // Transform the response to include URNs and friendly names
+      const models = objectsList.items?.map((item: any) => ({
+        name: item.objectKey || item.key,
+        urn: Buffer.from(item.objectId || item.id).toString('base64'),
+        size: item.size,
+        lastModified: item.lastModified,
+        objectId: item.objectId || item.id
+      })) || [];
+
+      this.logger.log(`✅ Found ${models.length} models in bucket`);
+      return models;
+    } catch (error) {
+      this.logger.error('❌ Error listing models:', error.message);
+      throw error;
+    }
+    */
+  }
 }

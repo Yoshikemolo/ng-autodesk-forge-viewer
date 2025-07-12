@@ -1,7 +1,8 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 import { SettingsService } from '../settings/settings.service';
-import axios from 'axios';
 
 @Injectable()
 export class ForgeService {
@@ -12,6 +13,7 @@ export class ForgeService {
   constructor(
     private configService: ConfigService,
     private settingsService: SettingsService,
+    private httpService: HttpService,
   ) {
     console.log('🔧 ForgeService constructor called');
   }
@@ -63,25 +65,38 @@ export class ForgeService {
 
       this.logger.log(`🔍 Making request to Forge with ClientID: ${clientId.substring(0, 8)}...`);
 
-      const scope = 'viewables:read data:read data:write data:create bucket:create bucket:read';
+      const scope = 'data:read data:write data:create bucket:create bucket:read';
       
       this.logger.log(`🔍 Forge API URL: https://developer.api.autodesk.com/authentication/v1/authenticate`);
       this.logger.log(`🔍 Scope: ${scope}`);
+      this.logger.log('🔍 About to create form data...');
 
-      const response = await axios.post(
-        'https://developer.api.autodesk.com/authentication/v1/authenticate',
-        new URLSearchParams({
-          client_id: clientId,
-          client_secret: clientSecret,
-          grant_type: 'client_credentials',
-          scope: scope,
-        }),
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+      // Use the correct form-urlencoded format as per Forge API documentation
+      const formData = new URLSearchParams();
+      formData.append('client_id', clientId);
+      formData.append('client_secret', clientSecret);
+      formData.append('grant_type', 'client_credentials');
+      formData.append('scope', scope);
+
+      this.logger.log('🔍 Form data created successfully');
+      this.logger.log(`🔍 Form data string: ${formData.toString()}`);
+      this.logger.log('🔍 About to make HTTP POST request...');
+
+      const response = await firstValueFrom(
+        this.httpService.post(
+          'https://developer.api.autodesk.com/authentication/v2/token',
+          formData.toString(),
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Accept': 'application/json'
+            },
+            timeout: 15000,
           },
-        },
+        )
       );
+
+      this.logger.log('🔍 HTTP POST request completed successfully');
 
       this.logger.log(`✅ Forge API response status: ${response.status}`);
       this.logger.log(`✅ Forge API response data keys: ${Object.keys(response.data || {}).join(', ')}`);
@@ -95,10 +110,23 @@ export class ForgeService {
     } catch (error) {
       this.logger.error('❌ Failed to get Forge access token');
       this.logger.error(`❌ Error message: ${error.message}`);
-      this.logger.error(`❌ Error response status: ${error.response?.status}`);
-      this.logger.error(`❌ Error response data: ${JSON.stringify(error.response?.data)}`);
-      this.logger.error(`❌ Full error:`, error);
-      throw error;
+      this.logger.error(`❌ Error name: ${error.name}`);
+      
+      if (error.response) {
+        this.logger.error(`❌ HTTP Status: ${error.response.status}`);
+        this.logger.error(`❌ Status Text: ${error.response.statusText}`);
+        this.logger.error(`❌ Response Headers: ${JSON.stringify(error.response.headers)}`);
+        this.logger.error(`❌ Response Data: ${JSON.stringify(error.response.data)}`);
+      } else if (error.request) {
+        this.logger.error('❌ No response received from server');
+        this.logger.error(`❌ Request: ${JSON.stringify(error.request)}`);
+      } else {
+        this.logger.error('❌ Error setting up request');
+        this.logger.error(`❌ Error config: ${JSON.stringify(error.config)}`);
+      }
+      
+      this.logger.error(`❌ Full error stack:`, error.stack);
+      throw new BadRequestException(`Failed to authenticate with Forge API: ${error.message}`);
     }
   }
 
@@ -106,18 +134,20 @@ export class ForgeService {
     const token = await this.getAccessToken();
 
     try {
-      const response = await axios.post(
-        'https://developer.api.autodesk.com/oss/v2/buckets',
-        {
-          bucketKey,
-          policyKey: 'transient',
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+      const response = await firstValueFrom(
+        this.httpService.post(
+          'https://developer.api.autodesk.com/oss/v2/buckets',
+          {
+            bucketKey,
+            policyKey: 'transient',
           },
-        },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          },
+        )
       );
 
       return response.data;
@@ -137,15 +167,17 @@ export class ForgeService {
   ): Promise<any> {
     const token = await this.getAccessToken();
 
-    const response = await axios.put(
-      `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${objectName}`,
-      fileBuffer,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/octet-stream',
+    const response = await firstValueFrom(
+      this.httpService.put(
+        `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${objectName}`,
+        fileBuffer,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/octet-stream',
+          },
         },
-      },
+      )
     );
 
     return response.data;
@@ -154,28 +186,30 @@ export class ForgeService {
   async translateModel(urn: string): Promise<any> {
     const token = await this.getAccessToken();
 
-    const response = await axios.post(
-      'https://developer.api.autodesk.com/modelderivative/v2/designdata/job',
-      {
-        input: {
-          urn,
+    const response = await firstValueFrom(
+      this.httpService.post(
+        'https://developer.api.autodesk.com/modelderivative/v2/designdata/job',
+        {
+          input: {
+            urn,
+          },
+          output: {
+            formats: [
+              {
+                type: 'svf',
+                views: ['2d', '3d'],
+              },
+            ],
+          },
         },
-        output: {
-          formats: [
-            {
-              type: 'svf',
-              views: ['2d', '3d'],
-            },
-          ],
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'x-ads-force': 'true',
+          },
         },
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'x-ads-force': 'true',
-        },
-      },
+      )
     );
 
     return response.data;
@@ -184,15 +218,42 @@ export class ForgeService {
   async getTranslationStatus(urn: string): Promise<any> {
     const token = await this.getAccessToken();
 
-    const response = await axios.get(
-      `https://developer.api.autodesk.com/modelderivative/v2/designdata/${urn}/manifest`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    const response = await firstValueFrom(
+      this.httpService.get(
+        `https://developer.api.autodesk.com/modelderivative/v2/designdata/${urn}/manifest`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      },
+      )
     );
 
     return response.data;
+  }
+
+  async listObjects(bucketKey: string): Promise<any> {
+    const token = await this.getAccessToken();
+
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(
+          `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        )
+      );
+
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 404) {
+        // Bucket doesn't exist or is empty
+        return { items: [] };
+      }
+      throw error;
+    }
   }
 }
