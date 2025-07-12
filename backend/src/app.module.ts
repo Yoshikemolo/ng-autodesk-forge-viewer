@@ -12,6 +12,8 @@ import { ForgeModule } from './modules/forge/forge.module';
 import { ModelsModule } from './modules/models/models.module';
 import { AnnotationsModule } from './modules/annotations/annotations.module';
 import { HealthModule } from './modules/health/health.module';
+import { SettingsModule } from './modules/settings/settings.module';
+import { TestModule } from './modules/test/test.module';
 
 // Config
 import { typeOrmConfig } from './config/typeorm.config';
@@ -32,8 +34,8 @@ import { typeOrmConfig } from './config/typeorm.config';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
-      playground: process.env.GRAPHQL_PLAYGROUND === 'true',
-      introspection: process.env.GRAPHQL_INTROSPECTION === 'true',
+      playground: true,
+      introspection: true,
       context: ({ req, res }) => ({ req, res }),
       formatError: (error) => {
         const graphQLFormattedError = {
@@ -52,6 +54,8 @@ import { typeOrmConfig } from './config/typeorm.config';
     ModelsModule,
     AnnotationsModule,
     HealthModule,
+    SettingsModule,
+    TestModule,
   ],
 })
 export class AppModule {}

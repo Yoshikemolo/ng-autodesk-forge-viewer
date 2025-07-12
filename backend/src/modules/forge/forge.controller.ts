@@ -7,22 +7,50 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ForgeService } from './forge.service';
 
 @Controller('forge')
 export class ForgeController {
-  constructor(private readonly forgeService: ForgeService) {}
+  private readonly logger = new Logger(ForgeController.name);
+
+  constructor(private readonly forgeService: ForgeService) {
+    this.logger.log('🟢 ForgeController initialized successfully');
+  }
+
+  @Get('test')
+  getTest() {
+    this.logger.log('🟢 Test endpoint called - ForgeController is working!');
+    return { message: 'ForgeController is working!', timestamp: new Date().toISOString() };
+  }
 
   @Get('auth/token')
   async getAccessToken() {
-    const token = await this.forgeService.getAccessToken();
-    return {
-      access_token: token,
-      token_type: 'Bearer',
-      expires_in: 3600,
-    };
+    console.log('🔴 CRITICAL: GET /forge/auth/token endpoint called');
+    this.logger.log('🔴 ENTRY POINT: GET /forge/auth/token endpoint called');
+    this.logger.log('🔴 Request received, starting authentication process...');
+    
+    try {
+      console.log('🔴 CRITICAL: About to call ForgeService.getAccessToken()...');
+      this.logger.log('🔴 About to call ForgeService.getAccessToken()...');
+      const token = await this.forgeService.getAccessToken();
+      console.log('✅ CRITICAL: Successfully got access token from ForgeService');
+      this.logger.log('✅ Successfully got access token from ForgeService');
+      return {
+        access_token: token,
+        token_type: 'Bearer',
+        expires_in: 3600,
+      };
+    } catch (error) {
+      console.error('❌ CRITICAL: Error in getAccessToken endpoint:', error.message);
+      console.error('❌ CRITICAL: Error stack:', error.stack);
+      this.logger.error('❌ Error in getAccessToken endpoint:', error.message);
+      this.logger.error('❌ Error stack:', error.stack);
+      this.logger.error('❌ Full error object:', error);
+      throw error;
+    }
   }
 
   @Post('upload')

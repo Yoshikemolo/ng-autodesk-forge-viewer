@@ -83,6 +83,8 @@ type Query {
   me: User!
   model(id: String!): Model!
   models: [Model!]!
+  testForgeService: String!
+  testQuery: String!
   user(id: String!): User!
   users: [User!]!
 }

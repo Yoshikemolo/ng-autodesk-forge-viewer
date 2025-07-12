@@ -48,12 +48,24 @@ CREATE TABLE IF NOT EXISTS annotations (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create settings table
+CREATE TABLE IF NOT EXISTS settings (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    key VARCHAR(255) UNIQUE NOT NULL,
+    value TEXT NOT NULL,
+    description TEXT,
+    is_encrypted BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes
 CREATE INDEX idx_models_user_id ON models(user_id);
 CREATE INDEX idx_models_status ON models(status);
 CREATE INDEX idx_annotations_model_id ON annotations(model_id);
 CREATE INDEX idx_annotations_user_id ON annotations(user_id);
 CREATE INDEX idx_annotations_type ON annotations(type);
+CREATE INDEX idx_settings_key ON settings(key);
 
 -- Add updated_at triggers
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
@@ -63,6 +75,9 @@ CREATE TRIGGER update_models_updated_at BEFORE UPDATE ON models
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_annotations_updated_at BEFORE UPDATE ON annotations
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_settings_updated_at BEFORE UPDATE ON settings
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert default user for development
